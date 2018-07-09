@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 2018-07-08 13:23:40
+-- Generation Time: 2018-07-08 14:38:15
 -- 服务器版本： 5.7.14
 -- PHP Version: 5.6.25
 
@@ -27,7 +27,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `14` (
-  `no` int(11) NOT NULL,
+  `no` varchar(11) NOT NULL,
   `name` varchar(20) NOT NULL,
   `total_book_num` int(10) DEFAULT NULL,
   `like_book_type` varchar(5) DEFAULT NULL,
@@ -44,14 +44,14 @@ CREATE TABLE `14` (
   `fuying_page` int(10) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-
+-- --------------------------------------------------------
 
 --
 -- 表的结构 `15`
 --
 
 CREATE TABLE `15` (
-  `no` int(11) NOT NULL,
+  `no` varchar(11) NOT NULL,
   `name` varchar(20) NOT NULL,
   `total_book_num` int(10) DEFAULT NULL,
   `like_book_type` varchar(5) DEFAULT NULL,
@@ -67,13 +67,15 @@ CREATE TABLE `15` (
   `daying_page` int(10) NOT NULL,
   `fuying_page` int(10) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
 
 --
 -- 表的结构 `16`
 --
 
 CREATE TABLE `16` (
-  `no` int(11) NOT NULL,
+  `no` varchar(11) NOT NULL,
   `name` varchar(20) NOT NULL,
   `total_book_num` int(10) DEFAULT NULL,
   `like_book_type` varchar(5) DEFAULT NULL,
@@ -90,12 +92,14 @@ CREATE TABLE `16` (
   `fuying_page` int(10) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
 --
 -- 表的结构 `17`
 --
 
 CREATE TABLE `17` (
-  `no` int(11) NOT NULL,
+  `no` varchar(11) NOT NULL,
   `name` varchar(20) NOT NULL,
   `total_book_num` int(10) DEFAULT NULL,
   `like_book_type` varchar(5) DEFAULT NULL,

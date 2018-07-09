@@ -107,3 +107,5 @@ venv.bak/
 
 /config.json
 .idea/
+/nohup.out
+/test.py

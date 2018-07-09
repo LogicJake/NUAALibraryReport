@@ -1,5 +1,4 @@
 import json
-from multiprocessing import Process
 import pymysql
 import requests
 import re
@@ -53,7 +52,7 @@ def get_data_from_response(stuno,response):
     res['name'] = first_page.split("：")[0]
     pattern = re.compile(r'<b>([^<]*)<\/b>')
     match = pattern.findall(first_page)
-    res['total_book_num'] = match[0]
+    res['total_book_num'] = 0 if match[0].__len__()==0 else match[0]
     res['like_book_type'] = match[2]
     res['like_book_type_num'] = 0 if match[3].__len__()==0 else match[3]     #共借阅 like_book_type多少本
     match = pattern.findall(second_page)
@@ -79,55 +78,48 @@ def save_to_mysql(year,datas):
     cursor = conn.cursor()
     for data in datas:
         try:
-            sql = "INSERT INTO `{}` VALUES('{}','{}',{},'{}',{},'{}',{},'{}',{},{},'{}','{}',{},{},{})".format(year,data['no'],data['name'],data['total_book_num'],data['like_book_type'],data['like_book_type_num'],data['longest_book'],data['longest_book_day'],data['most_book_date'],data['most_book_num'],data['library_count'],data['earliest_date'],data['earliest_time'],data['night_day'],data['daying_page'],data['fuying_page'])
+            sql = "INSERT INTO `{}` VALUES('{}','{}',{},'{}',{},\"{}\",{},'{}',{},{},'{}','{}',{},{},{})".format(year,data['no'],data['name'],data['total_book_num'],data['like_book_type'],data['like_book_type_num'],data['longest_book'],data['longest_book_day'],data['most_book_date'],data['most_book_num'],data['library_count'],data['earliest_date'],data['earliest_time'],data['night_day'],data['daying_page'],data['fuying_page'])
             cursor.execute(sql)
         except Exception as e:
+            print(data['no'])
             print(e)
             print("[ERROR] Failed to save data")
     cursor.close()
     conn.close()
 
-def worker(i,j,k):
-    print(j,i, k)
-    error_banji = 0  # 班级出错次数
-    for m in range(1, 15):  # 班级
-        error_bannei = 0  # 班级内出错次数
-        datas = []
-        for n in range(1, 50):  # 班内编号
-            stuno = GenerateStuNum(i, j, k, m, n)
-            response = request_html(stuno)
-            time.sleep(0.5)
-            if response == -1:  # 该学号爬取错误
-                error_bannei += 1
-            else:
-                datas.append(get_data_from_response(stuno, response))
-                if datas.__len__() == 10:
-                    save_to_mysql(j, datas)
-                    datas.clear()
-                error_bannei = 0
-            if error_bannei == 3 and n == 3:  # 前三个都出错，说明该班级不存在跳出循环，遍历下一个班级、
-                error_banji += 1
-                break
-            if error_bannei == 5:  # 连续出错5个说明该班级遍历结束，跳出循环
-                break
-        if error_banji == 2:  # 该专业下连续两个班出错就说明该专业遍历结束，跳出循环
-            break
-        if datas.__len__() != 0:
-            save_to_mysql(j, datas)
-
-if __name__ == '__main__':
-    Global.__init__()
-
+def get_data():
     for j in range(14, 17 + 1):             # 年级
         for i in range(1, 17):              #学院
             begin_zhuanye = 1
             if i == 4:                      #四院从0开始
                 begin_zhuanye = 0
-            processpool = []
             for k in range(begin_zhuanye, 10):          #专业
-                worker(i,j,k)
-                # pro = Process(target=worker, args=(i,j, k,), name='thread-check-ip-' + str(i))
-                # processpool.append(pro)
-                # pro.start()
-                # for pro in processpool:
-                #     Process.join(pro)
+                error_banji = 0  # 班级出错次数
+                for m in range(1, 15):  # 班级
+                    error_bannei = 0  # 班级内出错次数
+                    datas = []
+                    for n in range(1, 50):  # 班内编号
+                        stuno = GenerateStuNum(i, j, k, m, n)
+                        response = request_html(stuno)
+                        time.sleep(0.5)
+                        if response == -1:  # 该学号爬取错误
+                            error_bannei += 1
+                        else:
+                            datas.append(get_data_from_response(stuno, response))
+                            if datas.__len__() == 10:
+                                save_to_mysql(j, datas)
+                                datas.clear()
+                            error_bannei = 0
+                        if error_bannei == 3 and n == 3:  # 前三个都出错，说明该班级不存在跳出循环，遍历下一个班级、
+                            error_banji += 1
+                            break
+                        if error_bannei == 5:  # 连续出错5个说明该班级遍历结束，跳出循环
+                            break
+                    if error_banji == 2:  # 该专业下连续两个班出错就说明该专业遍历结束，跳出循环
+                        break
+                    if datas.__len__() != 0:
+                        save_to_mysql(j, datas)
+
+if __name__ == '__main__':
+    Global.__init__()
+    get_data()
